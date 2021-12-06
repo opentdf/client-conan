@@ -3,14 +3,14 @@ Recipe for publishing to conan repositories
 
 ## Process for releasing a new version
 
-In the client-cpp repo:
+In the [client-cpp repo](https://github.com/opentdf/client-cpp):
 1. Update the opentdf/client-cpp repository with changes as usual, including updates to CHANGELOG and VERSION as appropriate, and merge to `main`
 2. Go to the [releases page](https://github.com/opentdf/client-cpp/releases)
 3. Create a new tag and release using the new version number
 4. Copy the URL for the zipfile of the release under 'Assets'
 5. Download the zipfile and get the sha256 (mac/linux: `shasum -a 256 <zip file name>` )
 
-In the client-conan repo:
+In the [client-conan repo](https://github.com/opentdf/client-conan):
 1. Create a release branch from `main`
 2. Update the file `recipe/config.yml` and add a new entry for the version 
 3. Update the file `recipe/src/conandata.yml` and add a new entry for the version with the URL and sha256 from steps 4 and 5 above
