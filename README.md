@@ -1,5 +1,5 @@
 # Conan recipe
-Recipe for publishing to conan repositories
+openTDF recipe for publishing client-cpp to conan repositories
 
 ## Process for releasing a new version
 
@@ -32,8 +32,4 @@ To test the recipe locally
 To ensure a clean test, run `conan remove opentdf-client` to delete it from conan's cache and delete the `recipe/all/test_package/build` directory to remove stale test package build artifacts.
 
 Do not check in the `all/test_package/build` directory, ignore or delete it before submitting changes
-
-### Nexus:
-
-`conan upload virtru-nexus opentdf-client`
 
