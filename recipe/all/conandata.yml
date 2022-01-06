@@ -17,3 +17,6 @@ sources:
   "0.2.7":
     url: https://github.com/opentdf/client-cpp/archive/refs/tags/0.2.7.zip
     sha256: "04bc3e918326660bee535037471f37340969cb363ffcc59dd51c6b6a721ad13f"
+  "0.2.8":
+    url: https://github.com/opentdf/client-cpp/archive/refs/tags/0.2.8.zip
+    sha256: "443445849b44c6cb0f7dd67be20f388cda3ffbea574ba4f1c44316d8e749d780"
