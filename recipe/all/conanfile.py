@@ -39,7 +39,7 @@ class OpenTDFConan(ConanFile):
         self.requires("jwt-cpp/0.4.0@")
 
     def source(self):
-        tools.get(**self.conan_data["sources"][self.version], destination=self._source_subfolder, strip_root=True)
+        self.run("git clone git@github.com:opentdf/client-cpp.git --depth 1 --branch " + self.version + " " + self._source_subfolder)
 
     def _configure_cmake(self):
         if self._cmake:
