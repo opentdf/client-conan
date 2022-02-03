@@ -9,13 +9,13 @@ class OpenTDFConan(ConanFile):
     name = "opentdf-client"
     url = "https://github.com/conan-io/conan-center-index"
     homepage = "https://www.virtru.com"
-    topics = ("openTDF", "opentdf-client", "tdf", "virtru")
+    topics = ("opentdf", "opentdf-client", "tdf", "virtru")
     description = "openTDF core c++ client library for creating and accessing TDF protected data"
     license = "MIT"
     generators = "cmake"
     settings = "os", "arch", "compiler", "build_type"
-    options = {"build_python": [True, False], "build_tests": [True, False], "fPIC": [True, False]}
-    default_options = {"build_python": False, "build_tests": False, "fPIC": True}
+    options = {"build_python": [True, False], "fPIC": [True, False]}
+    default_options = {"build_python": False, "fPIC": True}
     exports_sources = ["CMakeLists.txt"]
 
     _cmake = None
@@ -69,7 +69,6 @@ class OpenTDFConan(ConanFile):
             del self.options.fPIC
 
     def source(self):
-        #self.run("git clone git@github.com:opentdf/client-cpp.git --depth 1 --branch " + self.version + " " + self._source_subfolder)
         tools.get(**self.conan_data["sources"][self.version], destination=self._source_subfolder, strip_root=True)
 
     def _configure_cmake(self):
@@ -97,3 +96,4 @@ class OpenTDFConan(ConanFile):
         self.cpp_info.components["libopentdf"].names["cmake_find_package_multi"] = "opentdf-client"
         self.cpp_info.components["libopentdf"].names["pkg_config"] = "opentdf-client"
         self.cpp_info.components["libopentdf"].requires = ["openssl::openssl", "boost::boost", "libiconv::libiconv", "zlib::zlib", "ms-gsl::ms-gsl", "libxml2::libxml2", "libarchive::libarchive", "jwt-cpp::jwt-cpp", "nlohmann_json::nlohmann_json"]
+
