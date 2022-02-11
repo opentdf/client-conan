@@ -27,7 +27,7 @@ Documentation for publishing to conan-center is [here](https://github.com/conan-
 
 To test the recipe locally
 `cd <directory containing this README.md>`
-`conan create recipe/all opentdf-client/0.2.5@ -pr:b=default --build=opentdf-client`
+`conan create recipe/all opentdf-client/0.2.5@ -pr:b=default --build=opentdf-client --build=missing`
 
 To ensure a clean test, run `conan remove opentdf-client` to delete it from conan's cache and delete the `recipe/all/test_package/build` directory to remove stale test package build artifacts.
 
