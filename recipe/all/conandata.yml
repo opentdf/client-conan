@@ -1,4 +1,7 @@
 sources:
+  "0.6.0":
+    url: https://github.com/opentdf/client-cpp/archive/refs/heads/PLAT-1626-fix-sample-cpp-error.zip
+    sha256: "7d863afe3703ed175dda72f2455668d54f03c35c11ad6b971432b4a113d6fa1b"
   "0.5.3":
     url: https://github.com/opentdf/client-cpp/archive/refs/tags/0.5.3.zip
     sha256: "e30b745d7a83cc10a42db9f0e85a06e95d3c8693b274c5b13d1fe205e2725146"

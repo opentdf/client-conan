@@ -14,8 +14,8 @@ class OpenTDFConan(ConanFile):
     license = "MIT"
     generators = "cmake"
     settings = "os", "arch", "compiler", "build_type"
-    options = {"build_python": [True, False], "fPIC": [True, False]}
-    default_options = {"build_python": False, "fPIC": True, "libzip:with_openssl": False, "libarchive:with_zlib":False}
+    options = {"build_python": [True, False], "fPIC": [True, False], "without_libiconv": [True, False], "without_zlib": [True, False]}
+    default_options = {"build_python": False, "fPIC": True, "without_libiconv": False, "without_zlib": False}
     exports_sources = ["CMakeLists.txt"]
 
     _cmake = None
@@ -30,15 +30,14 @@ class OpenTDFConan(ConanFile):
 
     @property
     def _minimum_cpp_standard(self):
-        return 14
+        return 17
 
     @property
     def _minimum_compilers_version(self):
         return {
-            "Visual Studio": "17",
-            "gcc": "9",
-            "clang": "12",
-            "apple-clang": "12.0.0",
+            "Visual Studio": "15",
+            "gcc": "7.5.0",
+            "apple-clang": "11.0.0",
         }
 
     def validate(self):
@@ -54,22 +53,18 @@ class OpenTDFConan(ConanFile):
                     self.name, self._minimum_cpp_standard, self.settings.compiler, self.settings.compiler.version))
 
     def configure(self):
-        if str(self.settings.arch).startswith('arm'):
-            self.options["openssl"].no_asm = True
+        if self.options.without_zlib:
             self.options["libxml2"].zlib = False
-            self.options["libxml2"].lzma = False
-            self.options["libxml2"].icu = False
+        if self.options.without_libiconv:
+            self.options["boost"].without_libiconv = True
+            self.options["libarchive"].without_libiconv = True
 
     def requirements(self):
         self.requires("openssl/1.1.1l@")
-        if str(self.settings.arch).startswith('arm'):
-            self.requires("boost/1.74.0@")
-        else:
-            self.requires("boost/1.76.0@")
-        self.requires("zlib/1.2.11@")
+        self.requires("boost/1.76.0@")
         self.requires("ms-gsl/2.1.0@")
         self.requires("libxml2/2.9.10@")
-        self.requires("libarchive/3.5.2@")
+        self.requires("libarchive/3.5.1@")
         self.requires("nlohmann_json/3.10.4@")
         self.requires("jwt-cpp/0.4.0@")
 
@@ -104,5 +99,5 @@ class OpenTDFConan(ConanFile):
         self.cpp_info.components["libopentdf"].names["cmake_find_package"] = "opentdf-client"
         self.cpp_info.components["libopentdf"].names["cmake_find_package_multi"] = "opentdf-client"
         self.cpp_info.components["libopentdf"].names["pkg_config"] = "opentdf-client"
-        self.cpp_info.components["libopentdf"].requires = ["openssl::openssl", "boost::boost", "zlib::zlib", "ms-gsl::ms-gsl", "libxml2::libxml2", "libarchive::libarchive", "jwt-cpp::jwt-cpp", "nlohmann_json::nlohmann_json"]
+        self.cpp_info.components["libopentdf"].requires = ["openssl::openssl", "boost::boost", "ms-gsl::ms-gsl", "libxml2::libxml2", "libarchive::libarchive", "jwt-cpp::jwt-cpp", "nlohmann_json::nlohmann_json"]
 
