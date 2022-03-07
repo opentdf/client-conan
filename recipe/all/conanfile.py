@@ -35,9 +35,10 @@ class OpenTDFConan(ConanFile):
     @property
     def _minimum_compilers_version(self):
         return {
-            "Visual Studio": "15",
+            "Visual Studio": "17",
             "gcc": "7.5.0",
-            "apple-clang": "11.0.0",
+            "clang": "12",
+            "apple-clang": "12.0.0"
         }
 
     def validate(self):
