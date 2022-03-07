@@ -56,8 +56,9 @@ class OpenTDFConan(ConanFile):
         if self.options.without_zlib:
             self.options["libxml2"].zlib = False
         if self.options.without_libiconv:
-            self.options["boost"].without_libiconv = True
-            self.options["libarchive"].without_libiconv = True
+            self.options["boost"].without_locale = True
+            self.options["boost"].without_log = True
+            self.options["libarchive"].with_iconv = False
 
     def requirements(self):
         self.requires("openssl/1.1.1l@")
