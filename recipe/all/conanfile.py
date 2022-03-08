@@ -14,8 +14,8 @@ class OpenTDFConan(ConanFile):
     license = "MIT"
     generators = "cmake"
     settings = "os", "arch", "compiler", "build_type"
-    options = {"build_python": [True, False], "fPIC": [True, False], "without_libiconv": [True, False], "without_zlib": [True, False]}
-    default_options = {"build_python": False, "fPIC": True, "without_libiconv": False, "without_zlib": False}
+    options = {"build_python": [True, False], "fPIC": [True, False], "without_libiconv": [True, False], "without_zlib": [True, False], "branch_version": [True, False], "branch_repo": ["client-cpp", "tdf3-cpp"]}
+    default_options = {"build_python": False, "fPIC": True, "without_libiconv": False, "without_zlib": False, "branch_version": False}
     exports_sources = ["CMakeLists.txt"]
 
     _cmake = None
@@ -75,7 +75,14 @@ class OpenTDFConan(ConanFile):
             del self.options.fPIC
 
     def source(self):
-        tools.get(**self.conan_data["sources"][self.version], destination=self._source_subfolder, strip_root=True)
+        if self.options.branch_version:
+            self.output.warn("branch_repo = {}".format(self.options.branch_repo))
+            if self.options.branch_repo == "tdf3-cpp":
+                self.run("git clone git@github.com:virtru/tdf3-cpp.git --depth 1 --branch " + self.version + " " + self._source_subfolder)
+            else:
+                self.run("git clone git@github.com:opentdf/client-cpp.git --depth 1 --branch " + self.version + " " + self._source_subfolder)
+        else:
+            tools.get(**self.conan_data["sources"][self.version], destination=self._source_subfolder, strip_root=True)
 
     def _configure_cmake(self):
         if self._cmake:
