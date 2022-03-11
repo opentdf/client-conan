@@ -15,7 +15,7 @@ class OpenTDFConan(ConanFile):
     generators = "cmake"
     settings = "os", "arch", "compiler", "build_type"
     options = {"build_python": [True, False], "fPIC": [True, False], "without_libiconv": [True, False], "without_zlib": [True, False], "branch_version": [True, False], "branch_repo": ["client-cpp", "tdf3-cpp"]}
-    default_options = {"build_python": False, "fPIC": True, "without_libiconv": False, "without_zlib": False, "branch_version": False}
+    default_options = {"build_python": False, "fPIC": True, "without_libiconv": False, "without_zlib": False, "branch_version": False, "branch_repo": "client-cpp"}
     exports_sources = ["CMakeLists.txt"]
 
     _cmake = None
