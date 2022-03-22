@@ -11,7 +11,7 @@ class OpenTDFConan(ConanFile):
     homepage = "https://www.virtru.com"
     topics = ("opentdf", "opentdf-client", "tdf", "virtru")
     description = "openTDF core c++ client library for creating and accessing TDF protected data"
-    license = "MIT"
+    license = "BSD-3-Clause-Clear"
     generators = "cmake"
     settings = "os", "arch", "compiler", "build_type"
     options = {"build_python": [True, False], "fPIC": [True, False], "without_libiconv": [True, False], "without_zlib": [True, False], "branch_version": [True, False], "branch_repo": ["client-cpp", "tdf3-cpp"]}
@@ -46,12 +46,12 @@ class OpenTDFConan(ConanFile):
             tools.check_min_cppstd(self, self._minimum_cpp_standard)
         min_version = self._minimum_compilers_version.get(str(self.settings.compiler))
         if not min_version:
-            self.output.warn("{} recipe lacks information about the {} compiler support.".format(
+            self.output.warn("{} recipe could not find compiler minimum version for {}.".format(
                 self.name, self.settings.compiler))
         else:
             if tools.Version(self.settings.compiler.version) < min_version:
-                raise ConanInvalidConfiguration("{} requires C++{} support. The current compiler {} {} does not support it.".format(
-                    self.name, self._minimum_cpp_standard, self.settings.compiler, self.settings.compiler.version))
+                raise ConanInvalidConfiguration("{} recipe needs minimum version {} but found tools.Version({}) = {}".format(
+                    self.name, min_version, self.settings.compiler.version, tools.Version(self.settings.compiler.version) ))
 
     def configure(self):
         if self.options.without_zlib:
