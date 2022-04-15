@@ -1,5 +1,5 @@
 # Conan recipe
-openTDF recipe for publishing client-cpp to conan repositories
+OpenTDF recipe for publishing client-cpp to conan repositories
 
 ## Process for releasing a new version
 
