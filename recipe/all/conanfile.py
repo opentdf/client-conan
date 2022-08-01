@@ -14,8 +14,8 @@ class OpenTDFConan(ConanFile):
     license = "BSD-3-Clause-Clear"
     generators = "cmake"
     settings = "os", "arch", "compiler", "build_type"
-    options = {"build_python": [True, False], "fPIC": [True, False], "without_libiconv": [True, False], "without_zlib": [True, False], "branch_version": [True, False], "branch_repo": ["client-cpp", "tdf3-cpp"]}
-    default_options = {"build_python": False, "fPIC": True, "without_libiconv": False, "without_zlib": False, "branch_version": False, "branch_repo": "client-cpp"}
+    options = {"build_python": [True, False], "fPIC": [True, False], "without_libiconv": [True, False], "without_zlib": [True, False], "branch_version": [True, False]}
+    default_options = {"build_python": False, "fPIC": True, "without_libiconv": False, "without_zlib": False, "branch_version": False}
     exports_sources = ["CMakeLists.txt"]
 
     _cmake = None
@@ -59,16 +59,19 @@ class OpenTDFConan(ConanFile):
         if self.options.without_libiconv:
             self.options["boost"].without_locale = True
             self.options["boost"].without_log = True
-            self.options["libarchive"].with_iconv = False
 
     def requirements(self):
-        self.requires("openssl/1.1.1l@")
+        self.requires("openssl/1.1.1o@")
         self.requires("boost/1.76.0@")
         self.requires("ms-gsl/2.1.0@")
         self.requires("libxml2/2.9.10@")
-        self.requires("libarchive/3.5.1@")
         self.requires("nlohmann_json/3.10.4@")
         self.requires("jwt-cpp/0.4.0@")
+        # We do not require zlib but conan-center only allows 'stock' references, and boost+libxml2 
+        # specify differerent versions, which causes a build fail due to the dependency conflict.
+        # Overriding the version here allows a clean build with the stock build settings.
+        if not self.options.without_zlib: 
+            self.requires("zlib/1.2.12@")
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -76,11 +79,8 @@ class OpenTDFConan(ConanFile):
 
     def source(self):
         if self.options.branch_version:
-            self.output.warn("branch_repo = {}".format(self.options.branch_repo))
-            if self.options.branch_repo == "tdf3-cpp":
-                self.run("git clone git@github.com:virtru/tdf3-cpp.git --depth 1 --branch " + self.version + " " + self._source_subfolder)
-            else:
-                self.run("git clone git@github.com:opentdf/client-cpp.git --depth 1 --branch " + self.version + " " + self._source_subfolder)
+            self.output.warn("Building branch_version = {}".format(self.version))
+            self.run("git clone git@github.com:opentdf/client-cpp.git --depth 1 --branch " + self.version + " " + self._source_subfolder)
         else:
             tools.get(**self.conan_data["sources"][self.version], destination=self._source_subfolder, strip_root=True)
 
@@ -108,5 +108,8 @@ class OpenTDFConan(ConanFile):
         self.cpp_info.components["libopentdf"].names["cmake_find_package"] = "opentdf-client"
         self.cpp_info.components["libopentdf"].names["cmake_find_package_multi"] = "opentdf-client"
         self.cpp_info.components["libopentdf"].names["pkg_config"] = "opentdf-client"
-        self.cpp_info.components["libopentdf"].requires = ["openssl::openssl", "boost::boost", "ms-gsl::ms-gsl", "libxml2::libxml2", "libarchive::libarchive", "jwt-cpp::jwt-cpp", "nlohmann_json::nlohmann_json"]
+        if self.options.without_zlib:
+            self.cpp_info.components["libopentdf"].requires = ["openssl::openssl", "boost::boost", "ms-gsl::ms-gsl", "libxml2::libxml2", "jwt-cpp::jwt-cpp", "nlohmann_json::nlohmann_json"]
+        else:
+            self.cpp_info.components["libopentdf"].requires = ["openssl::openssl", "boost::boost", "ms-gsl::ms-gsl", "libxml2::libxml2", "jwt-cpp::jwt-cpp", "nlohmann_json::nlohmann_json", "zlib::zlib"]
 
