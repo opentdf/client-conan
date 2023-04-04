@@ -1,22 +1,37 @@
 sources:
+  "1.3.10":
+    url: "https://github.com/opentdf/client-cpp/archive/1.3.10.tar.gz"
+    sha256: "539bd5e64bceb86f63b3f7db75de470d5ea1d52ae6436a6a2d6789f7d0710dd4"
+  "1.3.9":
+    url: "https://github.com/opentdf/client-cpp/archive/1.3.9.tar.gz"
+    sha256: "8fdd88d90afe865ca86261c26abd1ca5e9895261490252199b7f9d4910ca0b49"
+  "1.3.8":
+    url: "https://github.com/opentdf/client-cpp/archive/1.3.8.tar.gz"
+    sha256: "0d73bd17f6d211c04136239e1db630e1ab320a6e41bd5c18533c44381519842c"
+  "1.3.6":
+    url: "https://github.com/opentdf/client-cpp/archive/1.3.6.tar.gz"
+    sha256: "e0d4cf1d0b1824d903a2b0ec1da528acb42623e32f3ca36aa28b2e950c3cc7a0"
+  "1.3.4":
+    url: "https://github.com/opentdf/client-cpp/archive/1.3.4.tar.gz"
+    sha256: "4b9836bff368249b709fc40e67c3a8664fed85a5d8247475ca1f741486210409"
+  "1.3.3":
+    url: "https://github.com/opentdf/client-cpp/archive/1.3.3.tar.gz"
+    sha256: "7949e662dc55a425771e5ecf2d96e25295d1e2394e805608aed72d1131896948"
+  "1.3.2":
+    url: "https://github.com/opentdf/client-cpp/archive/1.3.2.tar.gz"
+    sha256: "d9a38d3aa6114159c90e0c254c78ddda921e2d520851e4def57f3cd26c564b16"
+  "1.2.0":
+    url: "https://github.com/opentdf/client-cpp/archive/1.2.0.tar.gz"
+    sha256: "15828038809ed291ff7881206a675abc5162e1175c8b515363b9c584aebb08f7"
+  "1.1.6":
+    url: "https://github.com/opentdf/client-cpp/archive/1.1.6.tar.gz"
+    sha256: "83992c37c9a58ae2152660a4ffbf1784fe63d7a9e7b8466d10ca1074697b3d3a"
+  "1.1.5":
+    url: "https://github.com/opentdf/client-cpp/archive/1.1.5.tar.gz"
+    sha256: "8fd5b22b36b19cd58a18f63cbffe3d538263ef3aecde4802059951c4eb5ce044"
+  "1.1.3":
+    url: "https://github.com/opentdf/client-cpp/archive/1.1.3.tar.gz"
+    sha256: "67855999010f9c1496e170ad885f73b854f91eb1539e3c20d74b162295d5c732"
   "1.1.2":
-    url: https://github.com/opentdf/client-cpp/archive/refs/tags/1.1.2.zip
-    sha256: "efaf689c8a7e03b9be4a1e28f5202f5f0050efaa86e5adee7406cee73421448f"
-  "1.1.0":
-    url: https://github.com/opentdf/client-cpp/archive/refs/tags/1.1.0.tar.gz
-    sha256: "2c4c8c00ad67e71b3ad9a5d0473e33a51c8756af68971f0db9218f0e337aa1a5"
-  "1.0.0":
-    url: https://github.com/opentdf/client-cpp/archive/refs/tags/1.0.0.tar.gz
-    sha256: "a0c38aa06bb592b8749f8d02cbe67cbe7e35f83fde24b47c516ff28801414ac3"
-  "0.7.2":
-    url: https://github.com/opentdf/client-cpp/archive/refs/tags/0.7.2.tar.gz
-    sha256: "9fdfac4d223c5ad10ae98ea296e58be877d3976aa5c0b7f8a3c5322510e5f5d6"
-  "0.6.3":
-    url: https://github.com/opentdf/client-cpp/archive/refs/tags/0.6.3.zip
-    sha256: "586af1dc618f6a2fd3c1bceb3d7e0acb1307412a84ec09fe09d278d1bd2a43e5"
-  "0.6.2":
-    url: https://github.com/opentdf/client-cpp/archive/refs/tags/0.6.2.tar.gz
-    sha256: "9c9e17f845fbc0eda2deddf9548365e13f4c081c6f94a774f5f9817ab41d8185"
-  "0.6.1":
-    url: "https://github.com/opentdf/client-cpp/archive/0.6.1.tar.gz"
-    sha256: "4f4017efad3ef013822c92673f89fcef7f6553f5c78cee930e382a09adad0f23"
+    url: "https://github.com/opentdf/client-cpp/archive/1.1.2.tar.gz"
+    sha256: "4e41a18ef9d47aa9f964beffa78fdd4290a5f50336c6e4dc3c9bf2dd4b075d10"
