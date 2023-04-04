@@ -1,12 +1,16 @@
-from conans import CMake
 from conan import ConanFile
+from conan import __version__ as conan_version
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.files import get, copy, patch
 from conan.tools.build import check_min_cppstd
 from conan.tools.scm import Version
 from conan.tools.microsoft import is_msvc_static_runtime
+from conan.tools.layout import basic_layout
+from conan.tools.files import get
 import functools
 import os
+if conan_version < Version("2.0.0"):
+    from conans import CMake
 
 required_conan_version = ">=1.51.3"
 
@@ -18,7 +22,10 @@ class OpenTDFConan(ConanFile):
     topics = ("opentdf", "opentdf-client", "tdf", "virtru")
     description = "openTDF core c++ client library for creating and accessing TDF protected data"
     license = "BSD-3-Clause-Clear"
-    generators = "cmake", "cmake_find_package"
+    if conan_version < Version("2.0.0"):
+      generators = "cmake", "cmake_find_package"
+    else:
+      generators = "CMakeToolchain", "CMakeDeps"
     settings = "os", "arch", "compiler", "build_type"
     options = {"fPIC": [True, False]}
     default_options = {"fPIC": True}
@@ -45,10 +52,18 @@ class OpenTDFConan(ConanFile):
             "apple-clang": "12.0.0",
         }
 
+    def layout(self):
+       basic_layout(self, src_folder=self._source_subfolder)
+
     def export_sources(self):
-        self.copy("CMakeLists.txt")
-        for data in self.conan_data.get("patches", {}).get(self.version, []):
-            self.copy(data["patch_file"])
+        if conan_version < Version("2.0.0"):
+            self.copy("CMakeLists.txt")
+            for data in self.conan_data.get("patches", {}).get(self.version, []):
+                self.copy(data["patch_file"])
+        else:
+            copy(self, "CMakeLists.txt", self.recipe_folder, self.export_sources_folder)
+            for data in self.conan_data.get("patches", {}).get(self.version, []):
+                copy(self, data["patch_file"], self.recipe_folder, self.export_sources_folder)
 
     def validate(self):
         # check minimum cpp standard supported by compiler
@@ -66,7 +81,7 @@ class OpenTDFConan(ConanFile):
             raise ConanInvalidConfiguration(f'{self.name} can not be built with MT or MTd at this time')
 
     def requirements(self):
-        self.requires("openssl/1.1.1q")
+        self.requires("openssl/1.1.1s")
         self.requires("ms-gsl/2.1.0")
         self.requires("nlohmann_json/3.11.1")
         self.requires("jwt-cpp/0.4.0")
