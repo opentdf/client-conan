@@ -1,3 +1,6 @@
 recipe/all/test_package/build/
+recipe/all/test_package/*.cmake
+recipe/all/test_package/*.sh
+recipe/all/test_package/*.json
 .DS_Store
 *.swp

@@ -1,16 +1,18 @@
+#
 from conan import ConanFile
-from conan import __version__ as conan_version
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.files import get, copy, patch
 from conan.tools.build import check_min_cppstd
 from conan.tools.scm import Version
 from conan.tools.microsoft import is_msvc_static_runtime
-from conan.tools.layout import basic_layout
-from conan.tools.files import get
 import functools
 import os
+from conan import __version__ as conan_version
 if conan_version < Version("2.0.0"):
     from conans import CMake
+else:
+    from conan.tools.layout import basic_layout
+    from conan.tools.files import get
 
 required_conan_version = ">=1.51.3"
 
@@ -52,8 +54,9 @@ class OpenTDFConan(ConanFile):
             "apple-clang": "12.0.0",
         }
 
-    def layout(self):
-       basic_layout(self, src_folder=self._source_subfolder)
+    if conan_version >= Version("2.0.0"):
+        def layout(self):
+            basic_layout(self, src_folder=self._source_subfolder)
 
     def export_sources(self):
         if conan_version < Version("2.0.0"):
@@ -104,23 +107,24 @@ class OpenTDFConan(ConanFile):
         for data in self.conan_data.get("patches", {}).get(self.version, []):
             patch(self, **data)
 
-    @functools.lru_cache(1)
-    def _configure_cmake(self):
-        cmake = CMake(self)
-        cmake.configure(build_folder=self._build_subfolder)
-        return cmake
+    if conan_version < Version("2.0.0"):
+        @functools.lru_cache(1)
+        def _configure_cmake(self):
+            cmake = CMake(self)
+            cmake.configure(build_folder=self._build_subfolder)
+            return cmake
 
-    def build(self):
-        self._patch_sources()
-        cmake = self._configure_cmake()
-        cmake.build()
+        def build(self):
+            self._patch_sources()
+            cmake = self._configure_cmake()
+            cmake.build()
 
-    def package(self):
-        cmake = self._configure_cmake()
-        cmake.install()
-        copy(self, "*", dst=os.path.join(self.package_folder, "lib"), src=os.path.join(os.path.join(self._source_subfolder,"tdf-lib-cpp"), "lib"), keep_path=False)
-        copy(self, "*", dst=os.path.join(self.package_folder, "include"), src=os.path.join(os.path.join(self._source_subfolder,"tdf-lib-cpp"), "include"), keep_path=False)
-        copy(self, "LICENSE", dst=os.path.join(self.package_folder, "licenses"), src=self._source_subfolder, ignore_case=True, keep_path=False)
+        def package(self):
+            cmake = self._configure_cmake()
+            cmake.install()
+            copy(self, "*", dst=os.path.join(self.package_folder, "lib"), src=os.path.join(os.path.join(self._source_subfolder,"tdf-lib-cpp"), "lib"), keep_path=False)
+            copy(self, "*", dst=os.path.join(self.package_folder, "include"), src=os.path.join(os.path.join(self._source_subfolder,"tdf-lib-cpp"), "include"), keep_path=False)
+            copy(self, "LICENSE", dst=os.path.join(self.package_folder, "licenses"), src=self._source_subfolder, ignore_case=True, keep_path=False)
 
     # TODO - this only advertises the static lib, add dynamic lib also
     def package_info(self):
@@ -134,5 +138,3 @@ class OpenTDFConan(ConanFile):
         self.cpp_info.components["libopentdf"].names["cmake_find_package_multi"] = "opentdf-client"
         self.cpp_info.components["libopentdf"].names["pkg_config"] = "opentdf-client"
         self.cpp_info.components["libopentdf"].requires = ["openssl::openssl", "boost::boost", "ms-gsl::ms-gsl", "libxml2::libxml2", "jwt-cpp::jwt-cpp", "nlohmann_json::nlohmann_json"]
-        if Version(self.version) < "1.1.0":
-            self.cpp_info.components["libopentdf"].requires.append("libarchive::libarchive")
