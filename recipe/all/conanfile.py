@@ -8,7 +8,7 @@ from conan.tools.microsoft import is_msvc_static_runtime
 import functools
 import os
 
-required_conan_version = ">=1.51.3"
+required_conan_version = ">=1.59.0"
 
 
 class OpenTDFConan(ConanFile):
@@ -22,6 +22,10 @@ class OpenTDFConan(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
     options = {"fPIC": [True, False]}
     default_options = {"fPIC": True}
+    # REMOVE_FOR_CCI BEGIN
+    options = {"fPIC": [True, False], "branch_version": [True, False]}
+    default_options = {"fPIC": True, "branch_version": False}
+    # REMOVE_FOR_CCI END
 
     @property
     def _source_subfolder(self):
@@ -70,6 +74,7 @@ class OpenTDFConan(ConanFile):
         self.requires("ms-gsl/2.1.0")
         self.requires("nlohmann_json/3.11.1")
         self.requires("jwt-cpp/0.4.0")
+        self.requires("magic_enum/0.8.2")
         # Use newer boost+libxml2 after 1.3.6
         if Version(self.version) <= "1.3.6":
             self.requires("boost/1.79.0")
@@ -83,7 +88,13 @@ class OpenTDFConan(ConanFile):
             del self.options.fPIC
 
     def source(self):
-        get(self, **self.conan_data["sources"][self.version], destination=self._source_subfolder, strip_root=True)
+    #REMOVE_FOR_CCI BEGIN
+        if self.options.branch_version:
+            self.output.warn("Building branch_version = {}".format(self.version))
+            self.run("git clone git@github.com:opentdf/client-cpp.git --depth 1 --branch " + self.version + " " + self._source_subfolder)
+        else:
+    #REMOVE_FOR_CCI END
+            get(**self.conan_data["sources"][self.version], destination=self._source_subfolder, strip_root=True)
 
     def _patch_sources(self):
         for data in self.conan_data.get("patches", {}).get(self.version, []):
