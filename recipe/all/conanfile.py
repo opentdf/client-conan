@@ -8,6 +8,7 @@ from conan.tools.microsoft import is_msvc_static_runtime
 import functools
 import os
 from conan import __version__ as conan_version
+conan_version = Version("2.0.1")
 if conan_version < Version("2.0.0"):
     from conans import CMake
 else:
