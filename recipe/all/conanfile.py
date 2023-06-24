@@ -91,7 +91,7 @@ class OpenTDFConan(ConanFile):
     #REMOVE_FOR_CCI BEGIN
         if self.options.branch_version:
             self.output.warn("Building branch_version = {}".format(self.version))
-            self.run("git clone git@github.com:opentdf/client-cpp.git --depth 1 --branch " + self.version + " " + self._source_subfolder)
+            self.run("git clone https://github.com/opentdf/client-cpp.git --depth 1 --branch " + self.version + " " + self._source_subfolder)
         else:
     #REMOVE_FOR_CCI END
             get(**self.conan_data["sources"][self.version], destination=self._source_subfolder, strip_root=True)
