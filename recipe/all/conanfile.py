@@ -12,8 +12,24 @@ required_conan_version = ">=1.59.0"
 
 #REMOVE_FOR_CCI BEGIN
 # This recipe contains sections that will not be approved by Conan Center Index reviewers.
-# All code between the BEGIN/END comments should be removed before submitting this recipe
-# to CCI
+# All code between the BEGIN/END comments should be removed before submitting this recipe to CCI
+#
+# Options:
+#   branch_version - Default: False.  Set to True to have recipe use the supplied version as a branch/tag/release name 
+#                    to pull source from the client-cpp repo, instead of the usual static entry in the conandata.yml list.
+#                    Once the specified version has been built to the local cache, it can be consumed 
+#                    by other projects using that same name as the version
+#
+#                    Examples: 
+#                    Build from the 1.4.0 release tag in client-cpp:
+#                    conan create recipe/all opentdf-client/1.4.0@ --build=opentdf-client --build=missing -o opentdf-client:branch_version=True
+#                    Consume from cache:
+#                    self.requires("opentdf-client/1.4.0@")
+#
+#                    Build from the PLAT-1234-my-changes branch in client-cpp:
+#                    conan create recipe/all opentdf-client/PLAT-1234-my-changes@ --build=opentdf-client --build=missing -o opentdf-client:branch_version=True
+#                    Consume from cache:
+#                    self.requires("opentdf-client/PLAT-1234-changes@")
 #REMOVE_FOR_CCI END
 
 class OpenTDFConan(ConanFile):
