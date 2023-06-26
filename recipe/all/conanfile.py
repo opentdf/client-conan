@@ -10,6 +10,11 @@ import os
 
 required_conan_version = ">=1.59.0"
 
+#REMOVE_FOR_CCI BEGIN
+# This recipe contains sections that will not be approved by Conan Center Index reviewers.
+# All code between the BEGIN/END comments should be removed before submitting this recipe
+# to CCI
+#REMOVE_FOR_CCI END
 
 class OpenTDFConan(ConanFile):
     name = "opentdf-client"
@@ -22,10 +27,10 @@ class OpenTDFConan(ConanFile):
     settings = "os", "arch", "compiler", "build_type"
     options = {"fPIC": [True, False]}
     default_options = {"fPIC": True}
-    # REMOVE_FOR_CCI BEGIN
+    #REMOVE_FOR_CCI BEGIN
     options = {"fPIC": [True, False], "branch_version": [True, False]}
     default_options = {"fPIC": True, "branch_version": False}
-    # REMOVE_FOR_CCI END
+    #REMOVE_FOR_CCI END
 
     @property
     def _source_subfolder(self):
