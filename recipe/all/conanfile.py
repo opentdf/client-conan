@@ -12,11 +12,11 @@ conan_version = Version("2.0.1")
 if conan_version < Version("2.0.0"):
     from conans import CMake
 else:
+    from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
     from conan.tools.layout import basic_layout
     from conan.tools.files import get
 
-required_conan_version = ">=1.51.3"
-
+required_conan_version = ">=1.59.0"
 
 class OpenTDFConan(ConanFile):
     name = "opentdf-client"
@@ -25,6 +25,7 @@ class OpenTDFConan(ConanFile):
     topics = ("opentdf", "opentdf-client", "tdf", "virtru")
     description = "openTDF core c++ client library for creating and accessing TDF protected data"
     license = "BSD-3-Clause-Clear"
+    package_type = "library"
     if conan_version < Version("2.0.0"):
       generators = "cmake", "cmake_find_package"
     else:
@@ -57,7 +58,8 @@ class OpenTDFConan(ConanFile):
 
     if conan_version >= Version("2.0.0"):
         def layout(self):
-            basic_layout(self, src_folder=self._source_subfolder)
+            #basic_layout(self, src_folder=self._source_subfolder)
+            cmake_layout(self)
 
     def export_sources(self):
         if conan_version < Version("2.0.0"):
@@ -126,6 +128,18 @@ class OpenTDFConan(ConanFile):
             copy(self, "*", dst=os.path.join(self.package_folder, "lib"), src=os.path.join(os.path.join(self._source_subfolder,"tdf-lib-cpp"), "lib"), keep_path=False)
             copy(self, "*", dst=os.path.join(self.package_folder, "include"), src=os.path.join(os.path.join(self._source_subfolder,"tdf-lib-cpp"), "include"), keep_path=False)
             copy(self, "LICENSE", dst=os.path.join(self.package_folder, "licenses"), src=self._source_subfolder, ignore_case=True, keep_path=False)
+    else:
+        def build(self):
+            cmake = CMake(self)
+            cmake.configure()
+            cmake.build()
+
+        def package(self):
+            cmake = CMake(self)
+            cmake.install()
+            copy(self, "*", dst=os.path.join(self.package_folder, "lib"), src=os.path.join(os.path.join(self._source_subfolder,"tdf-lib-cpp"), "lib"), keep_path=False)
+            copy(self, "*", dst=os.path.join(self.package_folder, "include"), src=os.path.join(os.path.join(self._source_subfolder,"tdf-lib-cpp"), "include"), keep_path=False)
+            copy(self, "LICENSE", dst=os.path.join(self.package_folder, "licenses"), src=self._source_subfolder, ignore_case=True, keep_path=False)
 
     # TODO - this only advertises the static lib, add dynamic lib also
     def package_info(self):
@@ -133,8 +147,15 @@ class OpenTDFConan(ConanFile):
         self.cpp_info.set_property("cmake_target_name", "opentdf-client::opentdf-client")
         self.cpp_info.set_property("pkg_config_name", "opentdf-client")
 
-        self.cpp_info.components["libopentdf"].libs = ["opentdf_static"]
-        self.cpp_info.components["libopentdf"].set_property("cmake_target_name", "copentdf-client::opentdf-client")
+        self.cpp_info.libdirs=[os.path.join(os.path.join(self._source_subfolder,"tdf-lib-cpp"), "lib")]
+        self.cpp_info.includedirs=[os.path.join(os.path.join(self._source_subfolder,"tdf-lib-cpp"), "include")]
+
+        if self.options.shared:
+            self.cpp_info.components["libopentdf"].libs = ["opentdf"]
+        else:
+            self.cpp_info.components["libopentdf"].libs = ["opentdf_static", "opentdf_static_combined"]
+
+        self.cpp_info.components["libopentdf"].set_property("cmake_target_name", "opentdf-client::opentdf-client")
         self.cpp_info.components["libopentdf"].names["cmake_find_package"] = "opentdf-client"
         self.cpp_info.components["libopentdf"].names["cmake_find_package_multi"] = "opentdf-client"
         self.cpp_info.components["libopentdf"].names["pkg_config"] = "opentdf-client"
