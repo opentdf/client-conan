@@ -18,7 +18,11 @@ In the [client-conan repo](https://github.com/opentdf/client-conan):
 
 To build test the recipe locally (substituting the appropriate version number)
 `cd <directory containing this README.md>`
-`conan create recipe/all opentdf-client/0.2.5@ -pr:b=default --build=opentdf-client --build=missing`
+Conan 2.0.7:
+`conan create --build=opentdf-client --version 1.3.10@ --build=missing recipe/all`
+
+Conan 1.59.0:
+`conan create recipe/all opentdf-client/1.3.10@ --build=opentdf-client --build=missing`
 
 To ensure a clean test, run `conan remove opentdf-client` to delete it from conan's cache and delete the `recipe/all/test_package/build` directory to remove stale test package build artifacts.
 
@@ -27,17 +31,28 @@ Do not check in the `all/test_package/build` directory, ignore or delete it befo
 5. Merge the release branch into `main`
 6. Publish to conan per instructions (see below)
 
+
+## Building with this recipe instead of CCI published recipe
+
+## Building an unreleased client-cpp branch using a local clone of this recipe
+
+You can specify branch-version to pull source from a client-cpp branch instead of a tagged version in the conandata.yml file.  Once it is built and in the local conan cache,
+you can consume it in other project conanfile.py self.requires lists.
+Make a local clone of this repo, and from the root issue:
+
+NOTE: branch names must be all lowercase due to a conan restriction
+
+conan 2.0.7
+
+`git clean -ffdx;rm -rf ~/.conan2/p/b/opent*`
+`conan create --build=opentdf-client --build=missing recipe/all --version plat-1649-conan2-compatability -o opentdf-client/\*:branch_version=True`
+
+conan 1.59.0
+
+`git clean -ffdx;rm -rf ~/.conan/data/opentdf-client/plat-1649-conan2-compatability`
+`conan create recipe/all opentdf-client/PLAT-1649-conan2-compatability@ --build=opentdf-client --build=missing -o opentdf-client:branch_version=True`
+
 ## Publishing to a conan repository
-
-### internal Virtru-only Nexus conan repository:
-
-1. Access the us-west-2 VPN
-2. Add the nexus server to the conan servers list
-`conan remote add conan-virtru https://nexus.hub.virtru.com/repository/conan-virtru/ --force`
-3. Build the recipe locally (substituting the appropriate version number)
-`conan create recipe/all opentdf-client/0.2.5@ -pr:b=default --build=opentdf-client --build=missing`
-4. Publish the package to nexus.  The command will cycle through all versions in your local cache, answer 'yes' to the version you wish to publish.
-`conan upload -r conan-virtru opentdf-client`
 
 ### conan-center repository:
 There are two cases to consider when publishing to conan-center.  

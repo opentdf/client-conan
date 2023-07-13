@@ -7,16 +7,33 @@ from conan.tools.scm import Version
 from conan.tools.microsoft import is_msvc_static_runtime
 import functools
 import os
-from conan import __version__ as conan_version
-conan_version = Version("2.0.1")
-if conan_version < Version("2.0.0"):
-    from conans import CMake
-else:
-    from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
-    from conan.tools.layout import basic_layout
-    from conan.tools.files import get
+from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout
+from conan.tools.layout import basic_layout
+from conan.tools.files import get
 
 required_conan_version = ">=1.59.0"
+
+#REMOVE_FOR_CCI BEGIN
+# This recipe contains sections that will not be approved by Conan Center Index reviewers.
+# All code between the BEGIN/END comments should be removed before submitting this recipe to CCI
+#
+# Options:
+#   branch_version - Default: False.  Set to True to have recipe use the supplied version as a branch/tag/release name 
+#                    to pull source from the client-cpp repo, instead of the usual static entry in the conandata.yml list.
+#                    Once the specified version has been built to the local cache, it can be consumed 
+#                    by other projects using that same name as the version
+#
+#                    Examples: 
+#                    Build from the 1.4.0 release tag in client-cpp:
+#                    conan create recipe/all opentdf-client/1.4.0@ --build=opentdf-client --build=missing -o opentdf-client:branch_version=True
+#                    Consume from cache:
+#                    self.requires("opentdf-client/1.4.0@")
+#
+#                    Build from the PLAT-1234-my-changes branch in client-cpp:
+#                    conan create recipe/all opentdf-client/PLAT-1234-my-changes@ --build=opentdf-client --build=missing -o opentdf-client:branch_version=True
+#                    Consume from cache:
+#                    self.requires("opentdf-client/PLAT-1234-changes@")
+#REMOVE_FOR_CCI END
 
 class OpenTDFConan(ConanFile):
     name = "opentdf-client"
@@ -26,13 +43,14 @@ class OpenTDFConan(ConanFile):
     description = "openTDF core c++ client library for creating and accessing TDF protected data"
     license = "BSD-3-Clause-Clear"
     package_type = "library"
-    if conan_version < Version("2.0.0"):
-      generators = "cmake", "cmake_find_package"
-    else:
-      generators = "CMakeToolchain", "CMakeDeps"
+    generators = "CMakeToolchain", "CMakeDeps"
     settings = "os", "arch", "compiler", "build_type"
-    options = {"fPIC": [True, False]}
-    default_options = {"fPIC": True}
+    options = {"fPIC": [True, False], "shared": [True, False]}
+    default_options = {"fPIC": True, "shared": True}
+    #REMOVE_FOR_CCI BEGIN
+    options = {"fPIC": [True, False], "shared": [True, False], "branch_version": [True, False]}
+    default_options = {"fPIC": True, "shared": True, "branch_version": False}
+    #REMOVE_FOR_CCI END
 
     @property
     def _source_subfolder(self):
@@ -56,20 +74,23 @@ class OpenTDFConan(ConanFile):
             "apple-clang": "12.0.0",
         }
 
-    if conan_version >= Version("2.0.0"):
-        def layout(self):
-            #basic_layout(self, src_folder=self._source_subfolder)
-            cmake_layout(self)
+    #REMOVE_FOR_CCI BEGIN
+    @property
+    def is_branch_version(self):
+        try:
+            return self.options.branch_version
+        except:
+            return self.info.options.branch_version
+    #REMOVE_FOR_CCI END
+
+    def layout(self):
+        #basic_layout(self, src_folder=self._source_subfolder)
+        cmake_layout(self)
 
     def export_sources(self):
-        if conan_version < Version("2.0.0"):
-            self.copy("CMakeLists.txt")
-            for data in self.conan_data.get("patches", {}).get(self.version, []):
-                self.copy(data["patch_file"])
-        else:
-            copy(self, "CMakeLists.txt", self.recipe_folder, self.export_sources_folder)
-            for data in self.conan_data.get("patches", {}).get(self.version, []):
-                copy(self, data["patch_file"], self.recipe_folder, self.export_sources_folder)
+        copy(self, "CMakeLists.txt", self.recipe_folder, self.export_sources_folder)
+        for data in self.conan_data.get("patches", {}).get(self.version, []):
+            copy(self, data["patch_file"], self.recipe_folder, self.export_sources_folder)
 
     def validate(self):
         # check minimum cpp standard supported by compiler
@@ -91,6 +112,9 @@ class OpenTDFConan(ConanFile):
         self.requires("ms-gsl/2.1.0")
         self.requires("nlohmann_json/3.11.1")
         self.requires("jwt-cpp/0.4.0")
+        # Use magic_enum after 1.3.10
+        if Version(self.version) > "1.3.10":
+            self.requires("magic_enum/0.8.2")
         # Use newer boost+libxml2 after 1.3.6
         if Version(self.version) <= "1.3.6":
             self.requires("boost/1.79.0")
@@ -102,46 +126,34 @@ class OpenTDFConan(ConanFile):
     def config_options(self):
         if self.settings.os == "Windows":
             del self.options.fPIC
+        if self.options.shared:
+            del self.options.fPIC
 
     def source(self):
-        get(self, **self.conan_data["sources"][self.version], destination=self._source_subfolder, strip_root=True)
+    #REMOVE_FOR_CCI BEGIN
+        if self.is_branch_version:
+            #self.output.warn("Building branch_version = {}".format(self.version))
+            self.run("git clone https://github.com/opentdf/client-cpp.git --depth 1 --branch " + self.version + " " + self._source_subfolder)
+        else:
+    #REMOVE_FOR_CCI END
+            get(**self.conan_data["sources"][self.version], destination=self._source_subfolder, strip_root=True)
 
     def _patch_sources(self):
         for data in self.conan_data.get("patches", {}).get(self.version, []):
             patch(self, **data)
 
-    if conan_version < Version("2.0.0"):
-        @functools.lru_cache(1)
-        def _configure_cmake(self):
-            cmake = CMake(self)
-            cmake.configure(build_folder=self._build_subfolder)
-            return cmake
+    def build(self):
+        cmake = CMake(self)
+        cmake.configure()
+        cmake.build()
 
-        def build(self):
-            self._patch_sources()
-            cmake = self._configure_cmake()
-            cmake.build()
+    def package(self):
+        cmake = CMake(self)
+        cmake.install()
+        copy(self, "*", dst=os.path.join(self.package_folder, "lib"), src=os.path.join(os.path.join(self._source_subfolder,"tdf-lib-cpp"), "lib"), keep_path=False)
+        copy(self, "*", dst=os.path.join(self.package_folder, "include"), src=os.path.join(os.path.join(self._source_subfolder,"tdf-lib-cpp"), "include"), keep_path=False)
+        copy(self, "LICENSE", dst=os.path.join(self.package_folder, "licenses"), src=self._source_subfolder, ignore_case=True, keep_path=False)
 
-        def package(self):
-            cmake = self._configure_cmake()
-            cmake.install()
-            copy(self, "*", dst=os.path.join(self.package_folder, "lib"), src=os.path.join(os.path.join(self._source_subfolder,"tdf-lib-cpp"), "lib"), keep_path=False)
-            copy(self, "*", dst=os.path.join(self.package_folder, "include"), src=os.path.join(os.path.join(self._source_subfolder,"tdf-lib-cpp"), "include"), keep_path=False)
-            copy(self, "LICENSE", dst=os.path.join(self.package_folder, "licenses"), src=self._source_subfolder, ignore_case=True, keep_path=False)
-    else:
-        def build(self):
-            cmake = CMake(self)
-            cmake.configure()
-            cmake.build()
-
-        def package(self):
-            cmake = CMake(self)
-            cmake.install()
-            copy(self, "*", dst=os.path.join(self.package_folder, "lib"), src=os.path.join(os.path.join(self._source_subfolder,"tdf-lib-cpp"), "lib"), keep_path=False)
-            copy(self, "*", dst=os.path.join(self.package_folder, "include"), src=os.path.join(os.path.join(self._source_subfolder,"tdf-lib-cpp"), "include"), keep_path=False)
-            copy(self, "LICENSE", dst=os.path.join(self.package_folder, "licenses"), src=self._source_subfolder, ignore_case=True, keep_path=False)
-
-    # TODO - this only advertises the static lib, add dynamic lib also
     def package_info(self):
         self.cpp_info.set_property("cmake_file_name", "opentdf-client")
         self.cpp_info.set_property("cmake_target_name", "opentdf-client::opentdf-client")
@@ -153,10 +165,10 @@ class OpenTDFConan(ConanFile):
         if self.options.shared:
             self.cpp_info.components["libopentdf"].libs = ["opentdf"]
         else:
-            self.cpp_info.components["libopentdf"].libs = ["opentdf_static", "opentdf_static_combined"]
+            self.cpp_info.components["libopentdf"].libs = ["opentdf_static"]
 
         self.cpp_info.components["libopentdf"].set_property("cmake_target_name", "opentdf-client::opentdf-client")
         self.cpp_info.components["libopentdf"].names["cmake_find_package"] = "opentdf-client"
         self.cpp_info.components["libopentdf"].names["cmake_find_package_multi"] = "opentdf-client"
         self.cpp_info.components["libopentdf"].names["pkg_config"] = "opentdf-client"
-        self.cpp_info.components["libopentdf"].requires = ["openssl::openssl", "boost::boost", "ms-gsl::ms-gsl", "libxml2::libxml2", "jwt-cpp::jwt-cpp", "nlohmann_json::nlohmann_json"]
+        self.cpp_info.components["libopentdf"].requires = ["openssl::openssl", "boost::boost", "ms-gsl::ms-gsl", "libxml2::libxml2", "jwt-cpp::jwt-cpp", "nlohmann_json::nlohmann_json", "magic_enum::magic_enum"]
