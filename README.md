@@ -44,12 +44,12 @@ NOTE: branch names must be all lowercase due to a conan restriction
 
 conan 2.0.7
 
-`git clean -ffdx;rm -rf ~/.conan2/p/b/opent*`
+`git clean -ffdx;rm -rf ~/.conan2/p/b/opent*;rm -rf ~/.conan2/p/t/opent*;rm -rf ~/.conan2/p/opent*;conan remove opentdf-client`
 `conan create --build=opentdf-client --build=missing recipe/all --version plat-1649-conan2-compatability -o opentdf-client/\*:branch_version=True`
 
 conan 1.59.0
 
-`git clean -ffdx;rm -rf ~/.conan/data/opentdf-client/plat-1649-conan2-compatability`
+`git clean -ffdx;rm -rf ~/.conan/data/opentdf-client/plat-1649-conan2-compatability;conan remove opentdf-client`
 `conan create recipe/all opentdf-client/PLAT-1649-conan2-compatability@ --build=opentdf-client --build=missing -o opentdf-client:branch_version=True`
 
 ## Publishing to a conan repository
